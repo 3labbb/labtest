@@ -51,10 +51,15 @@ const startingTextContainer = document.querySelector(".starting-text");
 const testResult = document.querySelector(".test-results");
 const testInfo = document.querySelector(".time-word-info");
 
-const punctuation = `+",.-'"&!?:;#~=/$^()_<>`;
-const letters = "abcdefghijklmnopqrstuvwxyz";
-let testWords = [];
 export let testLetters = [];
+let testWords = [];
+
+// Example paragraphs (replace with backend fetch if desired)
+const paragraphs = [
+  "The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet and is commonly used as a typing exercise.",
+  "Practice makes perfect. The more you type, the faster and more accurately you will become. Take your time and focus on each word.",
+  "Typing accurately is more important than typing quickly. Speed will come naturally as your fingers learn the patterns and your brain adjusts."
+];
 
 export function initTest() {
   testConfiguration.classList.add("hide");
@@ -68,44 +73,28 @@ export function initTest() {
   startingTextContainer.classList.add("hide");
 
   typingTest.classList.add("no-click");
-  testWords = generateTestText();
-
+  
+  testWords = generateTestParagraph();
   createWords();
 }
 
-function generateTestText() {
-  const numberOfWords = decideNumberOfWords();
+function generateTestParagraph() {
   const includeToTest = testConfig["include-to-test"];
-  const words = [];
 
-  for (let i = 0; i < numberOfWords; i++) {
-    let wordLength = random(8) + 1;
-    let word = "";
+  // Select a random paragraph
+  let text = paragraphs[Math.floor(Math.random() * paragraphs.length)];
 
-    for (let j = 0; j < wordLength; j++) {
-      let randomLetter = letters[random(letters.length)];
-      if (random(8) === 4) {
-        word += randomLetter.toLocaleUpperCase();
-      } else {
-        word += randomLetter;
-      }
-    }
-
-    if (includeToTest.includes("punctuation")) {
-      if (random(8) % 2 === 0) {
-        word += punctuation[random(punctuation.length)];
-      }
-    }
-
-    if (includeToTest.includes("numbers")) {
-      if (random(8) % 2 === 0) {
-        word += " " + random(10);
-      }
-    }
-
-    words.push(word);
+  // Optionally add sentence variants
+  if (includeToTest.includes("numbers")) {
+    text += " The year is 2025 and typing skills are more useful than ever.";
   }
-  return words;
+
+  if (includeToTest.includes("punctuation")) {
+    text += " Can you handle punctuation like commas, periods, and question marks?";
+  }
+
+  // Split into words
+  return text.split(" ");
 }
 
 function createLetter(letter, parentContainer, i, j) {
@@ -138,14 +127,10 @@ function createWords() {
 function decideNumberOfWords() {
   return testConfig["test-by"] === "words"
     ? testConfig["time-word-config"]
-    : 40;
+    : paragraphs.join(" ").split(" ").length;
 }
 
-function random(limit) {
-  return Math.floor(Math.random() * limit);
-}
-
-export function resetTestWordsAndLetters(params) {
+export function resetTestWordsAndLetters() {
   testWords = [];
   testLetters = [];
 }
